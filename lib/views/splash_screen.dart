@@ -27,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color(0xff151d27),
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
@@ -42,7 +42,8 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
               Text('Hive Todo App!', style: TextStyle(
                 fontSize: 48,
-                fontFamily: 'Nunito-SemiBold',
+                fontFamily: 'RobotoSlab',
+                color: Colors.white,
                 fontWeight: FontWeight.bold          
               ),)
             ],

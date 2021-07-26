@@ -53,71 +53,96 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {    
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Color(0xff324d9b),
+      backgroundColor: Color(0xff151d27),
       body: ValueListenableBuilder(
         valueListenable: Boxes.getTasks().listenable(),
         builder: (context, value, _) {
           final tasks = box.values.toList().cast<Task>();
 
-           return tasks.isEmpty
+          return tasks.isEmpty
               ? Container()
-              : ListView.builder(
-                  itemCount: tasks.length,
-                  itemBuilder: (context, index) {
-                    return Card(                      
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25)
-                      ),
-                      color: Color(0xff051854),
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 16),
-                        child: ExpansionTile(
-                          tilePadding: EdgeInsets.symmetric(vertical: 16),
-                          leading: Checkbox(                          
-                            value: false,
-                            onChanged: (value) {
-                              value = true;
-                            },
-                            shape: CircleBorder(),
-                          ),
-                          title: Text(
-                            tasks[index].task,
+              : Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: ListView.builder(
+                    itemCount: tasks.length + 1,
+                    itemBuilder: (context, index) {
+                      if(index == 0) {
+                        return Container(
+                          alignment: Alignment.centerLeft,
+                          height: 100,
+                          child: Text(
+                            'What\'s up!',
                             style: TextStyle(
-                              fontSize: 32,
-                              fontFamily: 'Nunito-SemiBold',
-                              color: Colors.white
+                              color: Colors.white,
+                              fontFamily: 'RobotoSlab',
+                              fontSize: 48,
+                              fontWeight: FontWeight.bold
                             ),
                           ),
-                          subtitle: Text(tasks[index].date, style: TextStyle(
-                            fontFamily: 'Nunito-SemiBold',
-                            color: Colors.white,
-                          ),),
-                          collapsedIconColor: Colors.white,
+                        );
+                      } else {
+                        return Column(
                           children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: TextButton.icon(
-                                    label: Text('Edit'),
-                                    icon: Icon(Icons.edit),
-                                    onPressed: () => openExistingTask(tasks[index])
+                            Card(    
+                              elevation: 0,                  
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20)
+                              ),
+                              color: Color(0xff212c3c),
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 16),
+                                child: ExpansionTile(
+                                  tilePadding: EdgeInsets.all(4),
+                                  leading: Checkbox(                          
+                                    value: false,
+                                    onChanged: (value) {
+                                      value = true;
+                                    },
+                                    shape: CircleBorder(),
                                   ),
+                                  title: Text(
+                                    tasks[index - 1].task,
+                                    style: TextStyle(
+                                      fontSize: 28,
+                                      fontFamily: 'Nunito-SemiBold',
+                                      color: Colors.white
+                                    ),
+                                  ),
+                                  subtitle: Text(tasks[index - 1].date, style: TextStyle(
+                                    fontFamily: 'Nunito-SemiBold',
+                                    color: Colors.white,
+                                  ),),
+                                  collapsedIconColor: Colors.white,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: TextButton.icon(
+                                            label: Text('Edit'),
+                                            icon: Icon(Icons.edit),
+                                            onPressed: () => openExistingTask(tasks[index - 1])
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: TextButton.icon(
+                                            label: Text('Delete'),
+                                            icon: Icon(Icons.delete),
+                                            onPressed: () => deleteTask(tasks[index - 1]),
+                                          ),
+                                        )
+                                      ],
+                                    )
+                                  ],
                                 ),
-                                Expanded(
-                                  child: TextButton.icon(
-                                    label: Text('Delete'),
-                                    icon: Icon(Icons.delete),
-                                    onPressed: () => deleteTask(tasks[index]),
-                                  ),
-                                )
-                              ],
-                            )
+                              ),
+                            ),
+                            SizedBox(height: 4,)
                           ],
-                        ),
-                      ),
-                    );
-                  }
-            );
+                        );
+                      }                      
+                    }
+            ),
+              );
         },
       ),      
       floatingActionButton: FloatingActionButton(

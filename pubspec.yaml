@@ -73,6 +73,9 @@ flutter:
     - family: Nunito-SemiBold
       fonts:
         - asset: assets/fonts/Nunito-SemiBold.ttf
+    - family: RobotoSlab
+      fonts:
+        - asset: assets/fonts/RobotoSlab-Bold.ttf
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf
