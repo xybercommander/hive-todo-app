@@ -37,7 +37,76 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _modalBottomSheetMenu(){
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.white,
+      body: tasks.isEmpty 
+        ? Container()
+        : ListView.builder(
+            itemCount: tasks.length,
+            itemBuilder: (context, index) {
+              return Card(
+                child: ExpansionTile(
+                  title: Text(
+                    tasks[index].task,
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontFamily: 'Nunito-SemiBold'
+                    ),
+                  ),
+                  subtitle: Text(tasks[index].date),
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextButton.icon(
+                            label: Text('Edit'),
+                            icon: Icon(Icons.edit),
+                            onPressed: () {
+                              _priority = tasks[index].priority;
+                              _dateController.text = tasks[index].date;
+                              _taskController.text = tasks[index].task;
+                              _modalBottomSheetMenu(tasks[index]);
+                            }
+                          ),
+                        ),
+                        Expanded(
+                          child: TextButton.icon(
+                            label: Text('Delete'),
+                            icon: Icon(Icons.delete),
+                            onPressed: () {},
+                          ),
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              );
+            }
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => addTask(),
+        child: Icon(Icons.add),
+      ),
+    );
+  }
+
+  void addTask() {
+    _priority = '';
+    _dateController.text = '';
+    _taskController.text = '';
+    _modalBottomSheetMenu(
+      Task()
+        ..date = ''
+        ..priority = ''
+        ..task = ''
+    );
+  }
+
+  void _modalBottomSheetMenu(Task task) {    
     showModalBottomSheet(        
         isScrollControlled: true,        
         context: context,
@@ -59,9 +128,9 @@ class _HomePageState extends State<HomePage> {
                     dropdownColor: Colors.white,
                     isDense: true,
                     icon: Icon(Icons.arrow_drop_down_circle),
-                    style: TextStyle(fontSize: 18, fontFamily: 'Nunito-SemiBold',),
+                    style: TextStyle(fontSize: 18, fontFamily: 'Nunito-SemiBold',),                    
                     decoration: InputDecoration(
-                      labelText: 'Priority',
+                      labelText: task.priority == '' ? 'Priority' : task.priority,
                       labelStyle: TextStyle(fontSize: 18, fontFamily: 'Nunito-SemiBold',),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10)
@@ -86,12 +155,13 @@ class _HomePageState extends State<HomePage> {
                     },    
                   ),
                   SizedBox(height: 16,),
-                  TextField(
+                  TextFormField(
                     onTap: () => _handleDatePicker(),
                     controller: _dateController,
-                    readOnly: true,                    
-                    style: TextStyle(fontSize: 18, fontFamily: 'Nunito-SemiBold',),
-                    decoration: InputDecoration(
+                    readOnly: true,             
+                    // initialValue: ,
+                    style: TextStyle(fontSize: 18, fontFamily: 'Nunito-SemiBold',),                                       
+                    decoration: InputDecoration(                    
                       labelText: 'Date',
                       labelStyle: TextStyle(fontSize: 18, fontFamily: 'Nunito-SemiBold',),
                       border: OutlineInputBorder(
@@ -100,9 +170,10 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   SizedBox(height: 16,),
-                  TextField(
+                  TextFormField(
                     controller: _taskController,
                     style: TextStyle(fontSize: 18, fontFamily: 'Nunito-SemiBold',),
+                    // initialValue: task.task,
                     decoration: InputDecoration(
                       labelText: 'Task',
                       labelStyle: TextStyle(fontSize: 18, fontFamily: 'Nunito-SemiBold',),
@@ -113,10 +184,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   SizedBox(height: 16,),
                   MaterialButton(
-                    onPressed: () {
-                      print(_priority);
-                      print(_dateController.text);
-                      print(_taskController.text);
+                    onPressed: () {             
                       setState(() {
                         tasks.add(
                           Task()
@@ -124,7 +192,10 @@ class _HomePageState extends State<HomePage> {
                           ..date = _dateController.text
                           ..task = _taskController.text
                         );
-                      });
+                      });         
+                      _priority = '';
+                      _dateController.text = '';
+                      _taskController.text = '';                      
                     },
                     color: Theme.of(context).primaryColor,
                     shape: StadiumBorder(),
@@ -142,38 +213,6 @@ class _HomePageState extends State<HomePage> {
             ),
           );
         }
-    );
-  }
-
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
-      body: tasks.isEmpty 
-        ? Container()
-        : ListView.builder(
-            itemCount: tasks.length,
-            itemBuilder: (context, index) {
-              return Card(
-                child: ExpansionTile(
-                  title: Text(
-                    tasks[index].task,
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontFamily: 'Nunito-SemiBold'
-                    ),
-                  ),
-                  subtitle: Text(tasks[index].date),                  
-                ),
-              );
-            }
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _modalBottomSheetMenu(),
-        child: Icon(Icons.add),
-      ),
     );
   }
 }
