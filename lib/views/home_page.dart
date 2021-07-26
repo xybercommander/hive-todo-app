@@ -53,7 +53,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {    
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
+      backgroundColor: Color(0xff324d9b),
       body: ValueListenableBuilder(
         valueListenable: Boxes.getTasks().listenable(),
         builder: (context, value, _) {
@@ -64,36 +64,56 @@ class _HomePageState extends State<HomePage> {
               : ListView.builder(
                   itemCount: tasks.length,
                   itemBuilder: (context, index) {
-                    return Card(
-                      child: ExpansionTile(
-                        title: Text(
-                          tasks[index].task,
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontFamily: 'Nunito-SemiBold'
+                    return Card(                      
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25)
+                      ),
+                      color: Color(0xff051854),
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 16),
+                        child: ExpansionTile(
+                          tilePadding: EdgeInsets.symmetric(vertical: 16),
+                          leading: Checkbox(                          
+                            value: false,
+                            onChanged: (value) {
+                              value = true;
+                            },
+                            shape: CircleBorder(),
                           ),
+                          title: Text(
+                            tasks[index].task,
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontFamily: 'Nunito-SemiBold',
+                              color: Colors.white
+                            ),
+                          ),
+                          subtitle: Text(tasks[index].date, style: TextStyle(
+                            fontFamily: 'Nunito-SemiBold',
+                            color: Colors.white,
+                          ),),
+                          collapsedIconColor: Colors.white,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextButton.icon(
+                                    label: Text('Edit'),
+                                    icon: Icon(Icons.edit),
+                                    onPressed: () => openExistingTask(tasks[index])
+                                  ),
+                                ),
+                                Expanded(
+                                  child: TextButton.icon(
+                                    label: Text('Delete'),
+                                    icon: Icon(Icons.delete),
+                                    onPressed: () => deleteTask(tasks[index]),
+                                  ),
+                                )
+                              ],
+                            )
+                          ],
                         ),
-                        subtitle: Text(tasks[index].date),
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: TextButton.icon(
-                                  label: Text('Edit'),
-                                  icon: Icon(Icons.edit),
-                                  onPressed: () => openExistingTask(tasks[index])
-                                ),
-                              ),
-                              Expanded(
-                                child: TextButton.icon(
-                                  label: Text('Delete'),
-                                  icon: Icon(Icons.delete),
-                                  onPressed: () => deleteTask(tasks[index]),
-                                ),
-                              )
-                            ],
-                          )
-                        ],
                       ),
                     );
                   }
