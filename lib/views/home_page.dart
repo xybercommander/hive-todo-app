@@ -77,7 +77,7 @@ class _HomePageState extends State<HomePage> {
                           child: TextButton.icon(
                             label: Text('Delete'),
                             icon: Icon(Icons.delete),
-                            onPressed: () {},
+                            onPressed: () => deleteTask(tasks[index]),
                           ),
                         )
                       ],
@@ -92,6 +92,12 @@ class _HomePageState extends State<HomePage> {
         child: Icon(Icons.add),
       ),
     );
+  }
+
+  void deleteTask(Task task) {
+    setState(() {
+      tasks.remove(task);
+    });
   }
 
   void addTask() {
