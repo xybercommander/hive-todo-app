@@ -65,12 +65,7 @@ class _HomePageState extends State<HomePage> {
                           child: TextButton.icon(
                             label: Text('Edit'),
                             icon: Icon(Icons.edit),
-                            onPressed: () {
-                              _priority = tasks[index].priority;
-                              _dateController.text = tasks[index].date;
-                              _taskController.text = tasks[index].task;
-                              _modalBottomSheetMenu(tasks[index]);
-                            }
+                            onPressed: () => updateTask(tasks[index])
                           ),
                         ),
                         Expanded(
@@ -92,6 +87,13 @@ class _HomePageState extends State<HomePage> {
         child: Icon(Icons.add),
       ),
     );
+  }
+
+  void updateTask(Task task) {
+    _priority = task.priority;
+    _dateController.text = task.date;
+    _taskController.text = task.task;
+    _modalBottomSheetMenu(task);
   }
 
   void deleteTask(Task task) {
