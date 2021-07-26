@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive_todo_app/models/task_model.dart';
+import 'package:hive_todo_app/services/boxes.dart';
 import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
@@ -11,7 +14,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   
-  List<Task> tasks = [];
+  final box = Boxes.getTasks();
 
   TextEditingController _dateController = TextEditingController();
   TextEditingController _taskController = TextEditingController();
@@ -39,57 +42,95 @@ class _HomePageState extends State<HomePage> {
 
 
   @override
-  Widget build(BuildContext context) {
+  void dispose() {
+    Hive.box('tasks-box').close();
+    super.dispose();
+  }
+
+
+  //---------- UI -----------//
+  @override
+  Widget build(BuildContext context) {    
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
-      body: tasks.isEmpty 
-        ? Container()
-        : ListView.builder(
-            itemCount: tasks.length,
-            itemBuilder: (context, index) {
-              return Card(
-                child: ExpansionTile(
-                  title: Text(
-                    tasks[index].task,
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontFamily: 'Nunito-SemiBold'
-                    ),
-                  ),
-                  subtitle: Text(tasks[index].date),
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextButton.icon(
-                            label: Text('Edit'),
-                            icon: Icon(Icons.edit),
-                            onPressed: () => updateTask(tasks[index])
+      body: ValueListenableBuilder(
+        valueListenable: Boxes.getTasks().listenable(),
+        builder: (context, value, _) {
+          final tasks = box.values.toList().cast<Task>();
+
+           return tasks.isEmpty
+              ? Container()
+              : ListView.builder(
+                  itemCount: tasks.length,
+                  itemBuilder: (context, index) {
+                    return Card(
+                      child: ExpansionTile(
+                        title: Text(
+                          tasks[index].task,
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontFamily: 'Nunito-SemiBold'
                           ),
                         ),
-                        Expanded(
-                          child: TextButton.icon(
-                            label: Text('Delete'),
-                            icon: Icon(Icons.delete),
-                            onPressed: () => deleteTask(tasks[index]),
-                          ),
-                        )
-                      ],
-                    )
-                  ],
-                ),
-              );
-            }
-      ),
+                        subtitle: Text(tasks[index].date),
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextButton.icon(
+                                  label: Text('Edit'),
+                                  icon: Icon(Icons.edit),
+                                  onPressed: () => openExistingTask(tasks[index])
+                                ),
+                              ),
+                              Expanded(
+                                child: TextButton.icon(
+                                  label: Text('Delete'),
+                                  icon: Icon(Icons.delete),
+                                  onPressed: () => deleteTask(tasks[index]),
+                                ),
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                    );
+                  }
+            );
+        },
+      ),      
       floatingActionButton: FloatingActionButton(
-        onPressed: () => addTask(),
+        onPressed: () => newTask(),
         child: Icon(Icons.add),
       ),
     );
   }
+  
+  //----------- HIVE FUNCTIONS -----------//
+
+  void addTask() {
+    final task = Task()
+          ..priority = _priority
+          ..date = _dateController.text
+          ..task = _taskController.text;
+    
+    box.add(task);
+
+    _priority = '';
+    _dateController.text = '';
+    _taskController.text = '';    
+  }
 
   void updateTask(Task task) {
+    task.priority = _priority;
+    task.date = _dateController.text;
+    task.task = _taskController.text;
+
+    task.save();
+  }
+
+  void openExistingTask(Task task) {
     _priority = task.priority;
     _dateController.text = task.date;
     _taskController.text = task.task;
@@ -97,12 +138,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   void deleteTask(Task task) {
-    setState(() {
-      tasks.remove(task);
-    });
+    task.delete();
   }
 
-  void addTask() {
+  void newTask() {
     _priority = '';
     _dateController.text = '';
     _taskController.text = '';
@@ -113,6 +152,8 @@ class _HomePageState extends State<HomePage> {
         ..task = ''
     );
   }
+
+  //--------- MODAL BOTTOM SHEET ---------//
 
   void _modalBottomSheetMenu(Task task) {    
     showModalBottomSheet(        
@@ -138,7 +179,7 @@ class _HomePageState extends State<HomePage> {
                     icon: Icon(Icons.arrow_drop_down_circle),
                     style: TextStyle(fontSize: 18, fontFamily: 'Nunito-SemiBold',),                    
                     decoration: InputDecoration(
-                      labelText: task.priority == '' ? 'Priority' : task.priority,
+                      labelText: task.task == '' ? 'Priority' : task.priority,
                       labelStyle: TextStyle(fontSize: 18, fontFamily: 'Nunito-SemiBold',),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10)
@@ -158,8 +199,8 @@ class _HomePageState extends State<HomePage> {
                     }).toList(),
                     onChanged: (value) {
                       setState(() {
-                        _priority = value.toString();
-                      });
+                        _priority = value.toString();                        
+                      });                      
                     },    
                   ),
                   SizedBox(height: 16,),
@@ -175,7 +216,7 @@ class _HomePageState extends State<HomePage> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10)
                       )
-                    ),
+                    ),                    
                   ),
                   SizedBox(height: 16,),
                   TextFormField(
@@ -188,27 +229,15 @@ class _HomePageState extends State<HomePage> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10)
                       )
-                    ),
+                    ),                    
                   ),
                   SizedBox(height: 16,),
                   MaterialButton(
-                    onPressed: () {             
-                      setState(() {
-                        tasks.add(
-                          Task()
-                          ..priority = _priority
-                          ..date = _dateController.text
-                          ..task = _taskController.text
-                        );
-                      });         
-                      _priority = '';
-                      _dateController.text = '';
-                      _taskController.text = '';                      
-                    },
+                    onPressed: () => task.task == '' ? addTask() : updateTask(task),
                     color: Theme.of(context).primaryColor,
                     shape: StadiumBorder(),
                     child: Text(
-                      'Add Task',
+                      task.task == '' ? 'Add Task' : 'Update Task',
                       style: TextStyle(
                         color: Colors.white,
                         fontFamily: 'Nunito-SemiBold',                        
@@ -222,5 +251,5 @@ class _HomePageState extends State<HomePage> {
           );
         }
     );
-  }
+  }  
 }
