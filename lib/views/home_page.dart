@@ -56,12 +56,14 @@ class _HomePageState extends State<HomePage> {
         valueListenable: Boxes.getTasks().listenable(),
         builder: (context, value, _) {
           final tasks = box.values.toList().cast<Task>();
+          tasks.sort((a, b) => a.date.compareTo(b.date));
 
           return tasks.isEmpty
               ? Container()
               : Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: ListView.builder(
+                    
                     itemCount: tasks.length + 1,
                     itemBuilder: (context, index) {
                       if(index == 0) {
