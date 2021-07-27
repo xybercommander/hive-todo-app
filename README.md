@@ -1,6 +1,6 @@
 # hive_todo_app
 
-<img src="https://drive.google.com/file/d/1lENIzuShybL5kxXHxb--vjFkBM70UipB/view?usp=sharing" height=300 width=150>
+<img src="Screenshot.jpg" height=300 width=150>
 
 A new Flutter project.
 
