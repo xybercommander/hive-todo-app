@@ -1,6 +1,6 @@
 # hive_todo_app
 
-<img src="Screenshot.jpg" height=600 width=300>
+<img src="Screenshot.jpg" height=600 width=250>
 
 A new Flutter project.
 
