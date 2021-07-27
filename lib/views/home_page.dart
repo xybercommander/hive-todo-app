@@ -13,8 +13,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  
-  final box = Boxes.getTasks();
 
   TextEditingController _dateController = TextEditingController();
   TextEditingController _taskController = TextEditingController();
@@ -71,7 +69,7 @@ class _HomePageState extends State<HomePage> {
                           alignment: Alignment.centerLeft,
                           height: 100,
                           child: Text(
-                            'What\'s up!',
+                            'Your Tasks',
                             style: TextStyle(
                               color: Colors.white,
                               fontFamily: 'RobotoSlab',
@@ -84,22 +82,12 @@ class _HomePageState extends State<HomePage> {
                         return Column(
                           children: [
                             Card(    
-                              elevation: 0,                  
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20)
-                              ),
+                              elevation: 0,                                   
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                               color: Color(0xff212c3c),
                               child: Padding(
-                                padding: const EdgeInsets.only(right: 16),
+                                padding: const EdgeInsets.symmetric(horizontal: 0),
                                 child: ExpansionTile(
-                                  tilePadding: EdgeInsets.all(4),
-                                  leading: Checkbox(                          
-                                    value: false,
-                                    onChanged: (value) {
-                                      value = true;
-                                    },
-                                    shape: CircleBorder(),
-                                  ),
                                   title: Text(
                                     tasks[index - 1].task,
                                     style: TextStyle(
@@ -108,10 +96,36 @@ class _HomePageState extends State<HomePage> {
                                       color: Colors.white
                                     ),
                                   ),
-                                  subtitle: Text(tasks[index - 1].date, style: TextStyle(
-                                    fontFamily: 'Nunito-SemiBold',
-                                    color: Colors.white,
-                                  ),),
+                                  subtitle: Row(
+                                    children: [
+                                      Text(tasks[index - 1].date, style: TextStyle(
+                                        fontSize: 12,
+                                        fontFamily: 'Nunito-SemiBold',
+                                        color: Colors.white,
+                                      ),),
+                                      SizedBox(width: 12,),
+                                      Text(
+                                        'Priority: ', 
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontFamily: 'Nunito-SemiBold',
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      Text(
+                                        tasks[index - 1].priority,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontFamily: 'Nunito-SemiBold',
+                                          color: tasks[index - 1].priority == 'High'
+                                              ? Colors.red
+                                              : tasks[index - 1].priority == 'Medium'
+                                                  ? Colors.amber
+                                                  : Colors.greenAccent,
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                   collapsedIconColor: Colors.white,
                                   children: [
                                     Row(
@@ -154,6 +168,8 @@ class _HomePageState extends State<HomePage> {
   
   //----------- HIVE FUNCTIONS -----------//
 
+  final box = Boxes.getTasks();
+
   void addTask() {
     final task = Task()
           ..priority = _priority
@@ -164,7 +180,8 @@ class _HomePageState extends State<HomePage> {
 
     _priority = '';
     _dateController.text = '';
-    _taskController.text = '';    
+    _taskController.text = ''; 
+    Navigator.pop(context);   
   }
 
   void updateTask(Task task) {
@@ -173,6 +190,7 @@ class _HomePageState extends State<HomePage> {
     task.task = _taskController.text;
 
     task.save();
+    Navigator.pop(context);
   }
 
   void openExistingTask(Task task) {
@@ -207,7 +225,7 @@ class _HomePageState extends State<HomePage> {
         builder: (builder){
           return Container(                        
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Color(0xff151d27),
               borderRadius: BorderRadius.vertical(top: Radius.circular(15.0))
             ),
             padding: MediaQuery.of(context).viewInsets,
@@ -219,16 +237,21 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   SizedBox(height: 32,),
                   DropdownButtonFormField(                    
-                    dropdownColor: Colors.white,
+                    dropdownColor: Colors.blueGrey[800],
                     isDense: true,
-                    icon: Icon(Icons.arrow_drop_down_circle),
-                    style: TextStyle(fontSize: 18, fontFamily: 'Nunito-SemiBold',),                    
+                    icon: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white,),
+                    style: TextStyle(fontSize: 18, fontFamily: 'Nunito-SemiBold', color: Colors.white,),                    
                     decoration: InputDecoration(
                       labelText: task.task == '' ? 'Priority' : task.priority,
-                      labelStyle: TextStyle(fontSize: 18, fontFamily: 'Nunito-SemiBold',),
+                      labelStyle: TextStyle(fontSize: 18, fontFamily: 'Nunito-SemiBold', color: Colors.white,),   
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10)
-                      )
+                        borderSide: BorderSide(color: Colors.white54, width: 2),
+                        borderRadius: BorderRadius.circular(10),
+                      ),                                         
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white54, width: 2),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                     items: _priorities.map((String priority) {
                       return DropdownMenuItem(
@@ -236,8 +259,8 @@ class _HomePageState extends State<HomePage> {
                         child: Text(
                           priority,
                           style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 18
+                            color: Colors.white,
+                            fontSize: 18,                            
                           ),
                         ),
                       );
@@ -254,31 +277,41 @@ class _HomePageState extends State<HomePage> {
                     controller: _dateController,
                     readOnly: true,             
                     // initialValue: ,
-                    style: TextStyle(fontSize: 18, fontFamily: 'Nunito-SemiBold',),                                       
+                    style: TextStyle(fontSize: 18, fontFamily: 'Nunito-SemiBold', color: Colors.white,),                                       
                     decoration: InputDecoration(                    
                       labelText: 'Date',
-                      labelStyle: TextStyle(fontSize: 18, fontFamily: 'Nunito-SemiBold',),
+                      labelStyle: TextStyle(fontSize: 18, fontFamily: 'Nunito-SemiBold', color: Colors.white,),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10)
-                      )
-                    ),                    
+                        borderSide: BorderSide(color: Colors.white54, width: 2),
+                        borderRadius: BorderRadius.circular(10),
+                      ),    
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white54, width: 2),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
                   ),
                   SizedBox(height: 16,),
                   TextFormField(
                     controller: _taskController,
-                    style: TextStyle(fontSize: 18, fontFamily: 'Nunito-SemiBold',),
+                    style: TextStyle(fontSize: 18, fontFamily: 'Nunito-SemiBold', color: Colors.white,),
                     // initialValue: task.task,
                     decoration: InputDecoration(
                       labelText: 'Task',
-                      labelStyle: TextStyle(fontSize: 18, fontFamily: 'Nunito-SemiBold',),
+                      labelStyle: TextStyle(fontSize: 18, fontFamily: 'Nunito-SemiBold', color: Colors.white,),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10)
-                      )
-                    ),                    
+                        borderSide: BorderSide(color: Colors.white54, width: 2),
+                        borderRadius: BorderRadius.circular(10),
+                      ),    
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white54, width: 2),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
                   ),
                   SizedBox(height: 16,),
                   MaterialButton(
-                    onPressed: () => task.task == '' ? addTask() : updateTask(task),
+                    onPressed: () => task.task == '' ? addTask() : updateTask(task),                    
                     color: Theme.of(context).primaryColor,
                     shape: StadiumBorder(),
                     child: Text(
