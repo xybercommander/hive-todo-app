@@ -59,7 +59,21 @@ class _HomePageState extends State<HomePage> {
           tasks.sort((a, b) => a.date.compareTo(b.date));
 
           return tasks.isEmpty
-              ? Container()
+              ? Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,   
+                  child: Center(
+                    child: Text(
+                      'No Tasks Left\nYay! :)',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 56,
+                        fontFamily: 'RobotoSlab'
+                      ),
+                    ),
+                  ),
+                )
               : Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: ListView.builder(
